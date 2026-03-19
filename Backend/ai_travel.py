@@ -958,7 +958,8 @@ Where to Stay: suggest only 3 places and explain why
 Day-by-Day Itinerary:
 - Show all trip days
 - Maximum 3 time slots per day
-- Add Breakfast, Lunch, Dinner suggestions in same line
+- the time slots should be specific like 9:00 etc, don't mention slots like 'Morning', 'Afternoon', 'evening'
+- Add Breakfast, Lunch, Dinner suggestions in between time slots in different line
 - Include short explanation in brackets
 - Leave one blank line between days
 
