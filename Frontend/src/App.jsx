@@ -755,17 +755,29 @@ function TravelForm() {
 
     console.log("CHAT RESPONSE:", result); // 🔥 DEBUG (very important)
 
-    // ✅ CASE 1: Modification detected
-    if (result.action === "pending_update") {
-      setPendingIntent(result.updated_itinerary);
-      setChatReply(result.reply);
-    }
+   if (result.action === "pending_update") {
+  setPendingIntent(result.updated_itinerary);
+
+  // 🔥 SHOW MODIFIED PLAN IMMEDIATELY
+  setItinerary(result.updated_itinerary);
+
+  setChatReply("⚠️ Type YES to confirm or NO to cancel");
+}
 
     // ✅ CASE 2: User confirmed (YES)
     else if (result.action === "confirm_update") {
       setItinerary(result.updated_itinerary);
       setPendingIntent(null);
       setChatReply("✅ Plan updated successfully!");
+       // 🔥 SAVE TO DATABASE
+  await fetch("https://ai-planner-b139.onrender.com/update-itinerary", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      request_id: requestId,
+      itinerary: result.updated_itinerary
+    })
+  });
     }
 
     // ✅ CASE 3: User cancelled (NO)

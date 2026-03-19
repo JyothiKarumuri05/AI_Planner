@@ -282,25 +282,29 @@ app.post("/chat", (req, res) => {
       console.log("Rows updated:", this.changes);
 
       res.json({
-        reply: "✅ Your itinerary has been updated successfully!",
-        updated: true,
-        itinerary: result.updated_itinerary
-      });
+     action: "confirm_update",   // 🔥 IMPORTANT
+     updated_itinerary: result.updated_itinerary,
+    reply: "✅ Your itinerary has been updated successfully!"
+    });
     }
   );
 }
 
           // ===== PENDING UPDATE =====
           else if (result.action === "pending_update") {
-            res.json({
-              reply: result.reply,
-              pending_update: result.updated_itinerary
-            });
+           res.json({
+             action: "pending_update",   // 🔥 IMPORTANT
+             reply: result.reply,
+             updated_itinerary: result.updated_itinerary
+          });
           }
 
           // ===== CANCEL OR NORMAL =====
           else {
-            res.json({ reply: result.reply });
+            res.json({
+            action: "normal_reply",
+            reply: result.reply
+           });
           }
 
         } catch (err) {
@@ -313,57 +317,7 @@ app.post("/chat", (req, res) => {
 });
 
 
-// app.get("/download-pdf/:request_id", (req, res) => {
 
-//   const requestId = req.params.request_id;
-
-//   db.get(
-//     `SELECT final_itinerary, user_id 
-//      FROM travel_plans 
-//      WHERE request_id = ?`,
-//     [requestId],
-//     (err, row) => {
-
-//       if (err) return res.status(500).json({ error: err.message });
-//       if (!row) return res.status(404).json({ error: "Plan not found" });
-
-//       const pythonProcess = spawn("python", [
-//         path.join(__dirname, "generate_pdf.py"),
-//         JSON.stringify({
-//           itinerary: row.final_itinerary,
-//           user_id: row.user_id
-//         })
-//       ]);
-
-//       let resultData = "";
-
-//       pythonProcess.stdout.on("data", (data) => {
-//         resultData += data.toString();
-//       });
-
-//       pythonProcess.stderr.on("data", (data) => {
-//         console.error("PDF Python Error:", data.toString());
-//       });
-
-//       pythonProcess.on("close", () => {
-
-//         try {
-//           const result = JSON.parse(resultData.trim());
-
-//           if (!result.pdf_path) {
-//             return res.status(500).json({ error: "PDF generation failed" });
-//           }
-
-//           res.download(result.pdf_path);
-
-//         } catch (err) {
-//           console.error("PDF JSON Parse Error:", err);
-//           res.status(500).json({ error: "Invalid PDF response" });
-//         }
-//       });
-//     }
-//   );
-// });
 app.get("/download-pdf/:request_id", (req, res) => {
 
   const requestId = req.params.request_id;
