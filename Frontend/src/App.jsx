@@ -768,7 +768,8 @@ function TravelForm() {
     else if (result.action === "confirm_update") {
       setItinerary(result.updated_itinerary);
       setPendingIntent(null);
-      setChatReply("✅ Plan updated successfully!");
+      setChatReply(result.reply);
+     // setChatReply("✅ Plan updated successfully!");
        // 🔥 SAVE TO DATABASE
   await fetch("https://ai-planner-b139.onrender.com/update-itinerary", {
     method: "POST",
