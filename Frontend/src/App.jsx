@@ -711,10 +711,37 @@ function TravelForm() {
     setLoading(false);
   };
 
-  const handleChatSend = async () => {
-    if (!requestId || !chatMessage.trim()) return;
+  // const handleChatSend = async () => {
+  //   if (!requestId || !chatMessage.trim()) return;
 
-  const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
+  // const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({
+  //       request_id: requestId,
+  //       user_message: chatMessage,
+  //       pending_update: pendingIntent
+  //     })
+  //   });
+
+  //   const result = await response.json();
+
+  //   if (result.pending_update) setPendingIntent(result.pending_update);
+  //   if (result.updated && result.itinerary) {
+  //     setItinerary(result.itinerary);
+  //     setPendingIntent(null);
+  //   }
+
+  //   setChatReply(result.reply);
+  //   setChatMessage("");
+  // };
+
+
+  const handleChatSend = async () => {
+  if (!requestId || !chatMessage.trim()) return;
+
+  try {
+    const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -726,15 +753,40 @@ function TravelForm() {
 
     const result = await response.json();
 
-    if (result.pending_update) setPendingIntent(result.pending_update);
-    if (result.updated && result.itinerary) {
-      setItinerary(result.itinerary);
-      setPendingIntent(null);
+    console.log("CHAT RESPONSE:", result); // 🔥 DEBUG (very important)
+
+    // ✅ CASE 1: Modification detected
+    if (result.action === "pending_update") {
+      setPendingIntent(result.updated_itinerary);
+      setChatReply(result.reply);
     }
 
-    setChatReply(result.reply);
+    // ✅ CASE 2: User confirmed (YES)
+    else if (result.action === "confirm_update") {
+      setItinerary(result.updated_itinerary);
+      setPendingIntent(null);
+      setChatReply("✅ Plan updated successfully!");
+    }
+
+    // ✅ CASE 3: User cancelled (NO)
+    else if (result.action === "cancel_update") {
+      setPendingIntent(null);
+      setChatReply(result.reply);
+    }
+
+    // ✅ CASE 4: Normal chat
+    else {
+      setChatReply(result.reply);
+    }
+
     setChatMessage("");
-  };
+
+  } catch (error) {
+    console.error("CHAT ERROR:", error);
+    alert("Chat failed");
+  }
+};
+
 
   const createRow = (label, field, voiceFn) => (
     <div className="form-row">
