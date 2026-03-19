@@ -883,7 +883,7 @@ import google.generativeai as genai
 # ---------------- LOAD ENV ---------------- #
 
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY_1")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash")
@@ -914,8 +914,6 @@ def parse_single_date(date_string):
             pass
 
     raise ValueError("Unsupported date format")
-
-
 
 # ---------------- SEASON DATA ---------------- #
 

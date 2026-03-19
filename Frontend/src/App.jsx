@@ -687,7 +687,7 @@ function TravelForm() {
         })
       });
 
-     const response = await fetch("https://ai-planner-b139.onrender.com/save-travel", {
+      const response = await fetch("https://ai-planner-b139.onrender.com/save-travel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -711,36 +711,9 @@ function TravelForm() {
     setLoading(false);
   };
 
-  // const handleChatSend = async () => {
-  //   if (!requestId || !chatMessage.trim()) return;
-
-  // const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({
-  //       request_id: requestId,
-  //       user_message: chatMessage,
-  //       pending_update: pendingIntent
-  //     })
-  //   });
-
-  //   const result = await response.json();
-
-  //   if (result.pending_update) setPendingIntent(result.pending_update);
-  //   if (result.updated && result.itinerary) {
-  //     setItinerary(result.itinerary);
-  //     setPendingIntent(null);
-  //   }
-
-  //   setChatReply(result.reply);
-  //   setChatMessage("");
-  // };
-
-
   const handleChatSend = async () => {
-  if (!requestId || !chatMessage.trim()) return;
+    if (!requestId || !chatMessage.trim()) return;
 
-  try {
     const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -753,53 +726,15 @@ function TravelForm() {
 
     const result = await response.json();
 
-    console.log("CHAT RESPONSE:", result); // 🔥 DEBUG (very important)
-
-   if (result.action === "pending_update") {
-  setPendingIntent(result.updated_itinerary);
-
-  // 🔥 SHOW MODIFIED PLAN IMMEDIATELY
-  setItinerary(result.updated_itinerary);
-
-  setChatReply("⚠️ Type YES to confirm or NO to cancel");
-}
-
-    // ✅ CASE 2: User confirmed (YES)
-    else if (result.action === "confirm_update") {
-      setItinerary(result.updated_itinerary);
+    if (result.pending_update) setPendingIntent(result.pending_update);
+    if (result.updated && result.itinerary) {
+      setItinerary(result.itinerary);
       setPendingIntent(null);
-      setChatReply(result.reply);
-     // setChatReply("✅ Plan updated successfully!");
-       // 🔥 SAVE TO DATABASE
-  await fetch("https://ai-planner-b139.onrender.com/update-itinerary", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      request_id: requestId,
-      itinerary: result.updated_itinerary
-    })
-  });
     }
 
-    // ✅ CASE 3: User cancelled (NO)
-    else if (result.action === "cancel_update") {
-      setPendingIntent(null);
-      setChatReply(result.reply);
-    }
-
-    // ✅ CASE 4: Normal chat
-    else {
-      setChatReply(result.reply);
-    }
-
+    setChatReply(result.reply);
     setChatMessage("");
-
-  } catch (error) {
-    console.error("CHAT ERROR:", error);
-    alert("Chat failed");
-  }
-};
-
+  };
 
   const createRow = (label, field, voiceFn) => (
     <div className="form-row">
