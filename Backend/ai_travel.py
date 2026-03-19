@@ -873,177 +873,6 @@
 #     except Exception as e:
 #         print(json.dumps({"error": str(e)}))
 
-# import sys
-# import json
-# import os
-# import datetime
-# from dotenv import load_dotenv
-# import google.generativeai as genai
-
-# # ---------------- LOAD ENV ---------------- #
-
-# load_dotenv()
-# GEMINI_API_KEY = os.getenv("GEMINI_API_KEY_1")
-
-# genai.configure(api_key=GEMINI_API_KEY)
-# model = genai.GenerativeModel("gemini-2.5-flash")
-
-# # ---------------- DATE PARSER ---------------- #
-
-# def parse_single_date(date_string):
-#     parts = date_string.strip().split()
-
-#     if len(parts) < 2:
-#         raise ValueError("Invalid date format")
-
-#     day = parts[0]
-#     month_raw = parts[1].capitalize()
-
-#     if len(parts) == 3:
-#         year = parts[2]
-#     else:
-#         year = str(datetime.datetime.now().year)
-
-#     for fmt in ("%d %B %Y", "%d %b %Y"):
-#         try:
-#             return datetime.datetime.strptime(
-#                 f"{day} {month_raw} {year}",
-#                 fmt
-#             )
-#         except ValueError:
-#             pass
-
-#     raise ValueError("Unsupported date format")
-
-
-
-# # ---------------- SEASON DATA ---------------- #
-
-# SEASONAL_TEMP = {
-#     "January": "cold",
-#     "February": "cold",
-#     "March": "mild",
-#     "April": "warm",
-#     "May": "hot",
-#     "June": "very hot",
-#     "July": "very hot",
-#     "August": "very hot",
-#     "September": "warm",
-#     "October": "mild",
-#     "November": "cool",
-#     "December": "cold"
-# }
-
-# # ---------------- BASE PROMPT ---------------- #
-
-# BASE_PROMPT = """
-# Write a friendly and concise travel guide based on user input.
-
-# Use simple language like talking to a friend.
-# Maintain a suggesting tone and avoid using the word "should".
-# Do not use the '*' symbol anywhere.
-
-# STRICT LENGTH RULES (MANDATORY):
-
-# If trip duration is more than 6 days, group consecutive days.
-# Avoid storytelling or long explanations.
-
-# SECTION LIMITS:
-
-# Trip Overview: bullet points
-# Mode of Transportation: maximum 3 options
-# Budget Breakdown: exactly 4 short lines
-# Where to Stay: suggest only 3 places and explain why
-
-# Day-by-Day Itinerary:
-# - Show all trip days
-# - Maximum 3 time slots per day
-# - Add Breakfast, Lunch, Dinner suggestions in same line
-# - Include short explanation in brackets
-# - Leave one blank line between days
-
-# Essential Guidelines & Tips:
-# - Maximum 5 points
-# - Use green tick emoji format
-
-# Keep sentences compact.
-# Do not repeat similar activities.
-
-# FORMAT STRICTLY AS:
-
-# Trip Overview
-# Mode of Transportation
-# Budget Breakdown
-# Where to Stay
-# Day by Day Itinerary
-# Essential Guidelines & Tips
-# """
-
-# # ---------------- GENERATE ITINERARY ---------------- #
-
-# def generate_itinerary(data):
-
-#     start_date = parse_single_date(data["start_date"])
-#     end_date = parse_single_date(data["end_date"])
-
-#     trip_days = (end_date - start_date).days + 1
-
-#     travel_month = start_date.strftime("%B")
-#     seasonal_condition = SEASONAL_TEMP.get(travel_month, "pleasant")
-
-#     weather_text = f"In {travel_month}, the weather is usually {seasonal_condition}."
-
-#     full_prompt = f"""
-# Trip Details:
-# From: {data['current_city']}
-# To: {data['destination']}
-# Start Date: {data['start_date']}
-# End Date: {data['end_date']}
-# Total Days: {trip_days}
-# Budget: {data['budget']}
-# Group Type: {data['group_type']}
-# Travel Style: {data['travel_style']}
-# Food Preference: {data['food_preference']}
-
-# Weather Info:
-# {weather_text}
-
-# {BASE_PROMPT}
-# """
-
-#     try:
-#         response = model.generate_content(full_prompt)
-#         itinerary_text = response.text.strip()
-
-#         itinerary_text = itinerary_text.replace("```", "").strip()
-
-#         return {
-#             "itinerary": itinerary_text
-#         }
-
-#     except Exception as e:
-#         return {
-#             "error": str(e)
-#         }
-
-# # ---------------- MAIN ---------------- #
-
-# if __name__ == "__main__":
-#     try:
-#         input_data = json.loads(sys.argv[1])
-
-#         result = generate_itinerary(input_data)
-
-#         print(json.dumps(result))
-
-#     except Exception as e:
-#         print(json.dumps({
-#             "error": str(e)
-#         }))
-# 876
-
-
-
 import sys
 import json
 import os
@@ -1054,7 +883,7 @@ import google.generativeai as genai
 # ---------------- LOAD ENV ---------------- #
 
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY_1")
 
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash")
@@ -1085,6 +914,8 @@ def parse_single_date(date_string):
             pass
 
     raise ValueError("Unsupported date format")
+
+
 
 # ---------------- SEASON DATA ---------------- #
 
@@ -1127,8 +958,7 @@ Where to Stay: suggest only 3 places and explain why
 Day-by-Day Itinerary:
 - Show all trip days
 - Maximum 3 time slots per day
-- the time slots should be specific like 9:00 etc, don't mention slots like 'Morning', 'Afternoon', 'evening'
-- Add Breakfast, Lunch, Dinner suggestions in between time slots in different line
+- Add Breakfast, Lunch, Dinner suggestions in same line
 - Include short explanation in brackets
 - Leave one blank line between days
 
