@@ -556,14 +556,25 @@ app.get("/travel-history/:userId", async (req, res) => {
 
 app.post("/chat", async (req, res) => {
   try {
-    const { request_id, user_message, pending_update } = req.body;
+    // const { request_id, user_message, pending_update } = req.body;
 
+    // const dbRes = await pool.query(
+    //   "SELECT final_itinerary FROM travel_plans WHERE request_id = $1",
+    //   [request_id]
+    // );
+
+    // const itinerary = dbRes.rows[0].final_itinerary;
     const dbRes = await pool.query(
-      "SELECT final_itinerary FROM travel_plans WHERE request_id = $1",
-      [request_id]
-    );
+  "SELECT final_itinerary FROM travel_plans WHERE request_id = $1",
+  [request_id]
+);
 
-    const itinerary = dbRes.rows[0].final_itinerary;
+if (dbRes.rows.length === 0) {
+  console.error("❌ NO PLAN FOUND FOR REQUEST ID:", request_id);
+  return res.status(404).json({ error: "Itinerary not found" });
+}
+
+const itinerary = dbRes.rows[0].final_itinerary;
 
     const python = spawn("python", [
       path.join(__dirname, "chat_loop.py"),
@@ -594,12 +605,26 @@ if (!result.updated_itinerary) {
   return res.status(500).json({ error: "No updated itinerary received" });
 }
 
-await pool.query(
+// await pool.query(
+//   `UPDATE travel_plans 
+//    SET final_itinerary = $1 
+//    WHERE request_id = $2`,
+//   [result.updated_itinerary.trim(), request_id]
+// );
+
+const updateResult = await pool.query(
   `UPDATE travel_plans 
    SET final_itinerary = $1 
    WHERE request_id = $2`,
   [result.updated_itinerary.trim(), request_id]
 );
+
+console.log("Rows updated:", updateResult.rowCount);
+
+if (updateResult.rowCount === 0) {
+  console.error("❌ UPDATE FAILED - NO ROW FOUND");
+  return res.status(500).json({ error: "Update failed" });
+}
 
 console.log("✅ DATABASE UPDATED SUCCESSFULLY");
 
