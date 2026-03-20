@@ -711,30 +711,74 @@ function TravelForm() {
     setLoading(false);
   };
 
-  const handleChatSend = async () => {
-    if (!requestId || !chatMessage.trim()) return;
+  // const handleChatSend = async () => {
+  //   if (!requestId || !chatMessage.trim()) return;
 
-    const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        request_id: requestId,
-        user_message: chatMessage,
-        pending_update: pendingIntent
-      })
-    });
+  //   const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({
+  //       request_id: requestId,
+  //       user_message: chatMessage,
+  //       pending_update: pendingIntent
+  //     })
+  //   });
 
-    const result = await response.json();
+  //   const result = await response.json();
 
-    if (result.pending_update) setPendingIntent(result.pending_update);
-    if (result.updated && result.itinerary) {
-      setItinerary(result.itinerary);
-      setPendingIntent(null);
-    }
+  //   if (result.pending_update) setPendingIntent(result.pending_update);
+  //   if (result.updated && result.itinerary) {
+  //     setItinerary(result.itinerary);
+  //     setPendingIntent(null);
+  //   }
 
+  //   setChatReply(result.reply);
+  //   setChatMessage("");
+  // };
+
+const handleChatSend = async () => {
+  if (!requestId || !chatMessage.trim()) return;
+
+  const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      request_id: requestId,
+      user_message: chatMessage,
+      pending_update: pendingIntent
+    })
+  });
+
+  const result = await response.json();
+
+  console.log("CHAT RESPONSE:", result);
+
+  // ✅ PENDING UPDATE (AI suggestion)
+  if (result.action === "pending_update") {
+    setPendingIntent(result.updated_itinerary);
     setChatReply(result.reply);
-    setChatMessage("");
-  };
+  }
+
+  // ✅ CONFIRM UPDATE (YES clicked)
+  else if (result.action === "confirm_update") {
+    setItinerary(result.updated_itinerary);   // 🔥 update UI
+    setPendingIntent(null);
+    setChatReply("✅ Plan updated successfully!");
+  }
+
+  // ❌ CANCEL
+  else if (result.action === "cancel_update") {
+    setPendingIntent(null);
+    setChatReply(result.reply);
+  }
+
+  // 💬 NORMAL CHAT
+  else {
+    setChatReply(result.reply);
+  }
+
+  setChatMessage("");
+}; 
 
   const createRow = (label, field, voiceFn) => (
     <div className="form-row">

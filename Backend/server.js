@@ -592,10 +592,16 @@ app.post("/chat", async (req, res) => {
           [result.updated_itinerary, request_id]
         );
 
-        res.json({
-          action: "confirm_update",
-          updated_itinerary: result.updated_itinerary
-        });
+        // res.json({
+        //   action: "confirm_update",
+        //   updated_itinerary: result.updated_itinerary
+        // });
+      res.json({
+       action: "confirm_update",
+       updated: true,
+       itinerary: result.updated_itinerary,
+       updated_itinerary: result.updated_itinerary
+     }); 
 
       } else if (result.action === "pending_update") {
 
