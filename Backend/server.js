@@ -585,12 +585,23 @@ app.post("/chat", async (req, res) => {
 
       if (result.action === "confirm_update") {
 
-        await pool.query(
-          `UPDATE travel_plans 
-           SET final_itinerary = $1 
-           WHERE request_id = $2`,
-          [result.updated_itinerary, request_id]
-        );
+        console.log("🔥 CONFIRM UPDATE TRIGGERED");
+console.log("Request ID:", request_id);
+
+// 🔥 safety check
+if (!result.updated_itinerary) {
+  console.error("❌ EMPTY UPDATED ITINERARY");
+  return res.status(500).json({ error: "No updated itinerary received" });
+}
+
+await pool.query(
+  `UPDATE travel_plans 
+   SET final_itinerary = $1 
+   WHERE request_id = $2`,
+  [result.updated_itinerary.trim(), request_id]
+);
+
+console.log("✅ DATABASE UPDATED SUCCESSFULLY");
 
         // res.json({
         //   action: "confirm_update",

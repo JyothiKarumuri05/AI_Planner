@@ -121,7 +121,8 @@ model = genai.GenerativeModel("gemini-2.5-flash")
 
 def chat_with_model(data):
 
-    user_message = data["user_message"].strip().lower()
+    user_message = data["user_message"].strip()
+    lower_message = user_message.lower()
     itinerary = data["current_itinerary"]
     pending_update = data.get("pending_update")
 
@@ -131,13 +132,13 @@ def chat_with_model(data):
 
     if pending_update:
 
-        if user_message == "yes":
+        if lower_message == "yes":
             return {
                 "action": "confirm_update",
                 "updated_itinerary": pending_update
             }
 
-        elif user_message == "no":
+        elif lower_message == "no":
             return {
                 "action": "cancel_update",
                 "reply": "👍 No changes were made to your itinerary."
