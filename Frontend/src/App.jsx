@@ -761,7 +761,7 @@ const handleChatSend = async () => {
 
   // ✅ CONFIRM UPDATE (YES clicked)
   else if (result.action === "confirm_update") {
-    setItinerary(result.itinerary);   // 🔥 update UI
+    setItinerary(result.updated_itinerary);   // 🔥 update UI
     setPendingIntent(null);
     setChatReply("✅ Plan updated successfully!");
   }

@@ -730,8 +730,8 @@ app.post("/chat", async (req, res) => {
 
         return res.json({
           action: "confirm_update",
-          updated: true,
-          itinerary: result.updated_itinerary
+          //updated: true,
+          updated_itinerary: result.updated_itinerary
         });
       }
 
