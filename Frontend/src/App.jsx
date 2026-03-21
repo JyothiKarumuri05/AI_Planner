@@ -470,7 +470,7 @@ import {
   useUser
 } from "@clerk/clerk-react";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 import BookingAPI from "./BookingAPI";
 
@@ -596,7 +596,7 @@ function useVoiceInput(setField, setStatus) {
 
 function TravelForm() {
   const { user } = useUser();
-
+  const pendingRef = useRef(null);
   const [formData, setFormData] = useState({
     current_city: "",
     destination: "",
@@ -782,6 +782,51 @@ function TravelForm() {
 
 
 
+// const handleChatSend = async () => {
+//   if (!requestId || !chatMessage.trim()) return;
+
+//   console.log("📤 Sending pending_update:", pendingRef.current);
+
+//   const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({
+//       request_id: requestId,
+//       user_message: chatMessage,
+//       pending_update: pendingRef.current
+//     })
+//   });
+
+//   const result = await response.json();
+
+//   console.log("CHAT RESPONSE:", result);
+
+//   if (result.action === "pending_update") {
+//     pendingRef.current = result.updated_itinerary;
+//     setPendingIntent(result.updated_itinerary);
+//     setChatReply(result.reply);
+//   }
+
+//   else if (result.action === "confirm_update") {
+//     setItinerary(result.updated_itinerary);
+//     pendingRef.current = null;
+//     setPendingIntent(null);
+//     setChatReply("✅ Plan updated successfully!");
+//   }
+
+//   else if (result.action === "cancel_update") {
+//     pendingRef.current = null;
+//     setPendingIntent(null);
+//     setChatReply(result.reply);
+//   }
+
+//   else {
+//     setChatReply(result.reply);
+//   }
+
+//   setChatMessage("");
+// };
+
 const handleChatSend = async () => {
   if (!requestId || !chatMessage.trim()) return;
 
@@ -793,7 +838,7 @@ const handleChatSend = async () => {
     body: JSON.stringify({
       request_id: requestId,
       user_message: chatMessage,
-      pending_update: pendingRef.current
+      pending_update: pendingRef.current   // 🔥 FIX
     })
   });
 
@@ -801,12 +846,14 @@ const handleChatSend = async () => {
 
   console.log("CHAT RESPONSE:", result);
 
+  // ✅ STORE UPDATE
   if (result.action === "pending_update") {
     pendingRef.current = result.updated_itinerary;
     setPendingIntent(result.updated_itinerary);
     setChatReply(result.reply);
   }
 
+  // ✅ CONFIRM
   else if (result.action === "confirm_update") {
     setItinerary(result.updated_itinerary);
     pendingRef.current = null;
@@ -814,12 +861,14 @@ const handleChatSend = async () => {
     setChatReply("✅ Plan updated successfully!");
   }
 
+  // ❌ CANCEL
   else if (result.action === "cancel_update") {
     pendingRef.current = null;
     setPendingIntent(null);
     setChatReply(result.reply);
   }
 
+  // 💬 NORMAL
   else {
     setChatReply(result.reply);
   }

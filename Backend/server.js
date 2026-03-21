@@ -374,7 +374,7 @@
 
 
 // app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
+//   console.log(`Server runnning on port ${PORT}`);
 // });
 
 const bookingRoutes = require('./routes/bookingRoutes');
@@ -554,27 +554,31 @@ app.get("/travel-history/:userId", async (req, res) => {
 
 /* ---------- CHAT ROUTE ---------- */
 
+
+
+
 // app.post("/chat", async (req, res) => {
 //   try {
-//     // const { request_id, user_message, pending_update } = req.body;
 
-//     // const dbRes = await pool.query(
-//     //   "SELECT final_itinerary FROM travel_plans WHERE request_id = $1",
-//     //   [request_id]
-//     // );
+//     const { request_id, user_message, pending_update } = req.body;
 
-//     // const itinerary = dbRes.rows[0].final_itinerary;
+//     if (!request_id || !user_message) {
+//       return res.status(400).json({ error: "Missing data" });
+//     }
+
+//     console.log("📩 CHAT INPUT:", req.body);
+
 //     const dbRes = await pool.query(
-//   "SELECT final_itinerary FROM travel_plans WHERE request_id = $1",
-//   [request_id]
-// );
+//       "SELECT final_itinerary FROM travel_plans WHERE request_id = $1",
+//       [request_id]
+//     );
 
-// if (dbRes.rows.length === 0) {
-//   console.error("❌ NO PLAN FOUND FOR REQUEST ID:", request_id);
-//   return res.status(404).json({ error: "Itinerary not found" });
-// }
+//     if (dbRes.rows.length === 0) {
+//       console.error("❌ NO PLAN FOUND:", request_id);
+//       return res.status(404).json({ error: "Itinerary not found" });
+//     }
 
-// const itinerary = dbRes.rows[0].final_itinerary;
+//     const itinerary = dbRes.rows[0].final_itinerary;
 
 //     const python = spawn("python", [
 //       path.join(__dirname, "chat_loop.py"),
@@ -591,81 +595,81 @@ app.get("/travel-history/:userId", async (req, res) => {
 //       dataString += data.toString();
 //     });
 
-//     python.on("close", async () => {
-//       const result = JSON.parse(dataString.trim());
+//     python.stderr.on("data", (data) => {
+//       console.error("❌ Python Error:", data.toString());
+//     });
 
+//     python.on("close", async () => {
+
+//       let result;
+//       try {
+//         result = JSON.parse(dataString.trim());
+//       } catch (err) {
+//         console.error("❌ JSON Parse Error:", dataString);
+//         return res.status(500).json({ error: "Invalid AI response" });
+//       }
+
+//       // ================= CONFIRM UPDATE =================
 //       if (result.action === "confirm_update") {
 
-//         console.log("🔥 CONFIRM UPDATE TRIGGERED");
-// console.log("Request ID:", request_id);
+//         console.log("🔥 CONFIRM UPDATE");
 
-// // 🔥 safety check
-// if (!result.updated_itinerary) {
-//   console.error("❌ EMPTY UPDATED ITINERARY");
-//   return res.status(500).json({ error: "No updated itinerary received" });
-// }
+//         const updateResult = await pool.query(
+//           `UPDATE travel_plans 
+//            SET final_itinerary = $1 
+//            WHERE request_id = $2`,
+//           [result.updated_itinerary.trim(), request_id]
+//         );
 
-// // await pool.query(
-// //   `UPDATE travel_plans 
-// //    SET final_itinerary = $1 
-// //    WHERE request_id = $2`,
-// //   [result.updated_itinerary.trim(), request_id]
-// // );
+//         console.log("Rows updated:", updateResult.rowCount);
 
-// const updateResult = await pool.query(
-//   `UPDATE travel_plans 
-//    SET final_itinerary = $1 
-//    WHERE request_id = $2`,
-//   [result.updated_itinerary.trim(), request_id]
-// );
+//         if (updateResult.rowCount === 0) {
+//           return res.status(500).json({ error: "Update failed" });
+//         }
 
-// console.log("Rows updated:", updateResult.rowCount);
+//         return res.json({
+//           action: "confirm_update",
+//           //updated: true,
+//           updated_itinerary: result.updated_itinerary
+//         });
+//       }
 
-// if (updateResult.rowCount === 0) {
-//   console.error("❌ UPDATE FAILED - NO ROW FOUND");
-//   return res.status(500).json({ error: "Update failed" });
-// }
-
-// console.log("✅ DATABASE UPDATED SUCCESSFULLY");
-
-//         // res.json({
-//         //   action: "confirm_update",
-//         //   updated_itinerary: result.updated_itinerary
-//         // });
-//       res.json({
-//        action: "confirm_update",
-//        updated: true,
-//        itinerary: result.updated_itinerary,
-//        updated_itinerary: result.updated_itinerary
-//      }); 
-
-//       } else if (result.action === "pending_update") {
-
-//         res.json({
+//       // ================= PENDING =================
+//       else if (result.action === "pending_update") {
+//         return res.json({
 //           action: "pending_update",
 //           reply: result.reply,
 //           updated_itinerary: result.updated_itinerary
 //         });
-
-//       } else {
-//         res.json({ reply: result.reply });
 //       }
+
+//       // ================= CANCEL =================
+//       else if (result.action === "cancel_update") {
+//         return res.json({
+//           action: "cancel_update",
+//           reply: result.reply
+//         });
+//       }
+
+//       // ================= NORMAL =================
+//       else {
+//         return res.json({
+//           action: "normal_reply",
+//           reply: result.reply
+//         });
+//       }
+
 //     });
 
 //   } catch (err) {
+//     console.error("❌ CHAT ERROR:", err);
 //     res.status(500).json({ error: err.message });
 //   }
 // });
 
-
 app.post("/chat", async (req, res) => {
   try {
-
     const { request_id, user_message, pending_update } = req.body;
-
-    if (!request_id || !user_message) {
-      return res.status(400).json({ error: "Missing data" });
-    }
 
     console.log("📩 CHAT INPUT:", req.body);
 
@@ -675,8 +679,7 @@ app.post("/chat", async (req, res) => {
     );
 
     if (dbRes.rows.length === 0) {
-      console.error("❌ NO PLAN FOUND:", request_id);
-      return res.status(404).json({ error: "Itinerary not found" });
+      return res.status(404).json({ error: "Plan not found" });
     }
 
     const itinerary = dbRes.rows[0].final_itinerary;
@@ -701,73 +704,44 @@ app.post("/chat", async (req, res) => {
     });
 
     python.on("close", async () => {
+      const result = JSON.parse(dataString.trim());
 
-      let result;
-      try {
-        result = JSON.parse(dataString.trim());
-      } catch (err) {
-        console.error("❌ JSON Parse Error:", dataString);
-        return res.status(500).json({ error: "Invalid AI response" });
-      }
-
-      // ================= CONFIRM UPDATE =================
+      // ✅ CONFIRM UPDATE
       if (result.action === "confirm_update") {
-
-        console.log("🔥 CONFIRM UPDATE");
 
         const updateResult = await pool.query(
           `UPDATE travel_plans 
            SET final_itinerary = $1 
            WHERE request_id = $2`,
-          [result.updated_itinerary.trim(), request_id]
+          [result.updated_itinerary, request_id]
         );
 
         console.log("Rows updated:", updateResult.rowCount);
 
-        if (updateResult.rowCount === 0) {
-          return res.status(500).json({ error: "Update failed" });
-        }
-
         return res.json({
           action: "confirm_update",
-          //updated: true,
           updated_itinerary: result.updated_itinerary
         });
       }
 
-      // ================= PENDING =================
-      else if (result.action === "pending_update") {
-        return res.json({
-          action: "pending_update",
-          reply: result.reply,
-          updated_itinerary: result.updated_itinerary
-        });
+      // ✅ PENDING
+      if (result.action === "pending_update") {
+        return res.json(result);
       }
 
-      // ================= CANCEL =================
-      else if (result.action === "cancel_update") {
-        return res.json({
-          action: "cancel_update",
-          reply: result.reply
-        });
+      // ✅ CANCEL
+      if (result.action === "cancel_update") {
+        return res.json(result);
       }
 
-      // ================= NORMAL =================
-      else {
-        return res.json({
-          action: "normal_reply",
-          reply: result.reply
-        });
-      }
-
+      // ✅ NORMAL
+      return res.json(result);
     });
 
   } catch (err) {
-    console.error("❌ CHAT ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
-
 
 /* ---------- DOWNLOAD PDF ---------- */
 
