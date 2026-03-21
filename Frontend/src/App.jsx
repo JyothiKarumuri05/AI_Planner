@@ -1221,31 +1221,6 @@ if (!isValidDate(formData.start_date) || !isValidDate(formData.end_date)) {
     setLoading(false);
   };
 
-  // const handleChatSend = async () => {
-  //   if (!requestId || !chatMessage.trim()) return;
-
-  //   const response = await fetch("http://localhost:5000/chat", {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({
-  //       request_id: requestId,
-  //       user_message: chatMessage,
-  //       pending_update: pendingIntent
-  //     })
-  //   });
-
-  //   const result = await response.json();
-
-  //   if (result.pending_update) setPendingIntent(result.pending_update);
-  //   if (result.updated && result.itinerary) {
-  //     setItinerary(result.itinerary);
-  //     setPendingIntent(null);
-  //   }
-
-  //   setChatReply(result.reply);
-  //   setChatMessage("");
-  // };
-
 
   const handleChatSend = async () => {
   if (!requestId || !chatMessage.trim()) return;
@@ -1273,15 +1248,20 @@ if (!isValidDate(formData.start_date) || !isValidDate(formData.end_date)) {
     setChatReply(result.reply);
   }
 
-  // ✅ STEP 2: CONFIRM UPDATE
   else if (result.action === "confirm_update") {
-    setItinerary(result.updated_itinerary);  // UI update
-    pendingRef.current = null;
-    setPendingIntent(null); // Clear pending intent
-    //setItinerary( result.itinerary ||result.updated_itinerary);
-    
-    setChatReply("✅ Plan updated successfully!");
-  }
+  // 🔥 FORCE UI UPDATE
+  setItinerary("");  
+
+  setTimeout(() => {
+    setItinerary(result.itinerary || result.updated_itinerary);
+  }, 100);
+
+  pendingRef.current = null;
+  setPendingIntent(null);
+  setChatReply("✅ Plan updated successfully!");
+}
+
+
 
   // ❌ CANCEL
   else if (result.action === "cancel_update") {
