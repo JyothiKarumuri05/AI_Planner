@@ -339,7 +339,8 @@ load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-2.5-flash")
 
-
+print("🔥 FUNCTION CALLED")
+print("USER MESSAGE:", user_message)
 def chat_with_model(data):
 
     user_message = data["user_message"].strip()
@@ -369,12 +370,22 @@ def chat_with_model(data):
             }
 
     # ================= STEP 2 (TEST BLOCK) =================
-    if "change" in lower_message:
-        return {
-            "action": "pending_update",
-            "reply": "Test update. Reply YES",
-            "updated_itinerary": "🔥 NEW PLAN TEST"
-        }
+    # if "change" in lower_message:
+    #     return {
+    #         "action": "pending_update",
+    #         "reply": "Test update. Reply YES",
+    #         "updated_itinerary": "🔥 NEW PLAN TEST"
+    #     }
+    # ================= STEP 2 (FORCE TEST) =================
+print("🔥 CHECKING CHANGE BLOCK")
+
+if "change" in lower_message:
+    print("✅ CHANGE DETECTED")
+    return {
+        "action": "pending_update",
+        "reply": "Test update working. Reply YES",
+        "updated_itinerary": "🔥 NEW PLAN UPDATED SUCCESSFULLY"
+    }
 
     # ================= STEP 3 =================
     prompt = f"""
