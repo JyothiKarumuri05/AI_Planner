@@ -1242,20 +1242,25 @@ if (!isValidDate(formData.start_date) || !isValidDate(formData.end_date)) {
   //console.log("CHAT RESPONSE:", result);
 
   // ✅ STEP 1: STORE GENERATED PLAN
+  // if (result.action === "pending_update") {
+  //   pendingRef.current = result.updated_itinerary;  
+  //   setPendingIntent(result.updated_itinerary); // 🔥 CRITICAL FIX
+  //   setChatReply(result.reply);
+  // }
   if (result.action === "pending_update") {
-    pendingRef.current = result.updated_itinerary;  
-    setPendingIntent(result.updated_itinerary); // 🔥 CRITICAL FIX
-    setChatReply(result.reply);
-  }
+
+  console.log("🧠 GENERATED PLAN:", result.updated_itinerary);   // ✅ ADD
+  pendingRef.current = result.updated_itinerary;
+
+  console.log("💾 STORED IN REF:", pendingRef.current);         // ✅ ADD
+
+  setPendingIntent(result.updated_itinerary);
+  setChatReply(result.reply);
+}
 
   else if (result.action === "confirm_update") {
   // 🔥 FORCE UI UPDATE
-  setItinerary("");  
-
-  setTimeout(() => {
-    setItinerary(result.itinerary || result.updated_itinerary);
-  }, 100);
-
+   setItinerary(result.updated_itinerary);
   pendingRef.current = null;
   setPendingIntent(null);
   setChatReply("✅ Plan updated successfully!");
