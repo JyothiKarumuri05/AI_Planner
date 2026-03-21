@@ -703,40 +703,96 @@ app.post("/chat", async (req, res) => {
       console.error("❌ Python Error:", data.toString());
     });
 
-    python.on("close", async () => {
-      const result = JSON.parse(dataString.trim());
+    // python.on("close", async () => {
+    //   const result = JSON.parse(dataString.trim());
 
-      // ✅ CONFIRM UPDATE
-      if (result.action === "confirm_update") {
+    //   // ✅ CONFIRM UPDATE
+    //   if (result.action === "confirm_update") {
 
-        const updateResult = await pool.query(
-          `UPDATE travel_plans 
-           SET final_itinerary = $1 
-           WHERE request_id = $2`,
-          [result.updated_itinerary, request_id]
-        );
+    //     const updateResult = await pool.query(
+    //       `UPDATE travel_plans 
+    //        SET final_itinerary = $1 
+    //        WHERE request_id = $2`,
+    //       [result.updated_itinerary, request_id]
+    //     );
 
-        console.log("Rows updated:", updateResult.rowCount);
+    //     console.log("Rows updated:", updateResult.rowCount);
 
-        return res.json({
-          action: "confirm_update",
-          updated_itinerary: result.updated_itinerary
-        });
-      }
+    //     return res.json({
+    //       action: "confirm_update",
+    //       updated_itinerary: result.updated_itinerary
+    //     });
+    //   }
 
-      // // ✅ PENDING
-      // if (result.action === "pending_update") {
-      //   return res.json(result);
-      // }
+    //   // // ✅ PENDING
+    //   // if (result.action === "pending_update") {
+    //   //   return res.json(result);
+    //   // }
 
-      // // ✅ CANCEL
-      // if (result.action === "cancel_update") {
-      //   return res.json(result);
-      // }
+    //   // // ✅ CANCEL
+    //   // if (result.action === "cancel_update") {
+    //   //   return res.json(result);
+    //   // }
 
-      // ✅ NORMAL
-      return res.json(result);
+    //   // ✅ NORMAL
+    //   return res.json(result);
+    // });
+python.on("close", async () => {
+  let result;
+
+  try {
+    result = JSON.parse(dataString.trim());
+  } catch (err) {
+    console.error("❌ JSON ERROR:", dataString);
+    return res.status(500).json({ error: "Invalid AI response" });
+  }
+
+  // ================= CONFIRM UPDATE =================
+  if (result.action === "confirm_update") {
+
+    const updateResult = await pool.query(
+      `UPDATE travel_plans 
+       SET final_itinerary = $1 
+       WHERE request_id = $2`,
+      [result.updated_itinerary, request_id]
+    );
+
+    console.log("Rows updated:", updateResult.rowCount);
+
+    return res.json({
+      action: "confirm_update",
+      updated_itinerary: result.updated_itinerary
     });
+  }
+
+  // ================= PENDING UPDATE =================
+  else if (result.action === "pending_update") {
+
+    return res.json({
+      action: "pending_update",
+      reply: result.reply,
+      updated_itinerary: result.updated_itinerary
+    });
+  }
+
+  // ================= CANCEL =================
+  else if (result.action === "cancel_update") {
+
+    return res.json({
+      action: "cancel_update",
+      reply: result.reply
+    });
+  }
+
+  // ================= NORMAL =================
+  else {
+
+    return res.json({
+      action: "normal_reply",
+      reply: result.reply
+    });
+  }
+});
 
   } catch (err) {
     res.status(500).json({ error: err.message });

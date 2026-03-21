@@ -1175,10 +1175,19 @@ function TravelForm() {
       alert(`Please fill in the ${emptyField[0].replace("_", " ")} field.`);
       return;
     }
+    const isValidDate = (date) => {
+  return /^\d{1,2}\s[a-zA-Z]+(\s\d{4})?$/.test(date);
+};
+
+if (!isValidDate(formData.start_date) || !isValidDate(formData.end_date)) {
+  alert("❌ Invalid date format. Use: 6 april or 6 april 2025");
+  setLoading(false);
+  return;
+}
     setLoading(true);
 
     try {
-      await fetch("http://localhost:5000/sync-user", {
+      await fetch("https://ai-planner-b139.onrender.com/sync-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1188,7 +1197,7 @@ function TravelForm() {
         })
       });
 
-      const response = await fetch("http://localhost:5000/save-travel", {
+      const response = await fetch("https://ai-planner-b139.onrender.com/save-travel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1341,7 +1350,7 @@ function TravelHistory() {
   useEffect(() => {
     if (!user) return;
 
-    fetch(`http://localhost:5000/travel-history/${user.id}`)
+    fetch(`https://ai-planner-b139.onrender.com/travel-history/${user.id}`)
       .then(res => res.json())
       .then(data => setHistory(data));
   }, [user]);
@@ -1355,7 +1364,7 @@ function TravelHistory() {
         <button
           onClick={() =>
             window.open(
-              `http://localhost:5000/download-pdf/${selectedPlan.request_id}`,
+              `https://ai-planner-b139.onrender.com/download-pdf/${selectedPlan.request_id}`,
               "_blank"
             )
           }
