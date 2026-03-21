@@ -892,6 +892,52 @@ const cleanInput = (value) => {
 //   setChatMessage("");
 // };
 
+// const handleChatSend = async () => {
+//   if (!requestId || !chatMessage.trim()) return;
+
+//   console.log("📤 Sending pending_update:", pendingRef.current);
+
+//   const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({
+//       request_id: requestId,
+//       user_message: chatMessage,
+//       pending_update: pendingRef.current   // ✅ FIX
+//     })
+//   });
+
+//   const result = await response.json();
+
+//   console.log("CHAT RESPONSE:", result);
+
+//   // ✅ AI suggests updated plan
+//   if (result.action === "pending_update") {
+//     pendingRef.current = result.updated_itinerary;   // 🔥 STORE
+//     setChatReply(result.reply);
+//   }
+
+//   // ✅ User confirms (YES)
+//   else if (result.action === "confirm_update") {
+//     setItinerary(result.updated_itinerary);
+//     pendingRef.current = null;   // 🔥 CLEAR
+//     setChatReply("✅ Plan updated successfully!");
+//   }
+
+//   // ❌ User cancels (NO)
+//   else if (result.action === "cancel_update") {
+//     pendingRef.current = null;
+//     setChatReply(result.reply);
+//   }
+
+//   // 💬 Normal chat
+//   else {
+//     setChatReply(result.reply);
+//   }
+
+//   setChatMessage("");
+// };
+
 const handleChatSend = async () => {
   if (!requestId || !chatMessage.trim()) return;
 
@@ -903,7 +949,7 @@ const handleChatSend = async () => {
     body: JSON.stringify({
       request_id: requestId,
       user_message: chatMessage,
-      pending_update: pendingRef.current   // ✅ FIX
+      pending_update: pendingRef.current   // 🔥 MUST NOT BE NULL
     })
   });
 
@@ -911,26 +957,25 @@ const handleChatSend = async () => {
 
   console.log("CHAT RESPONSE:", result);
 
-  // ✅ AI suggests updated plan
+  // ✅ STEP 1: STORE UPDATED PLAN
   if (result.action === "pending_update") {
-    pendingRef.current = result.updated_itinerary;   // 🔥 STORE
+    pendingRef.current = result.updated_itinerary;   // 🔥 CRITICAL
     setChatReply(result.reply);
   }
 
-  // ✅ User confirms (YES)
+  // ✅ STEP 2: CONFIRM UPDATE
   else if (result.action === "confirm_update") {
     setItinerary(result.updated_itinerary);
-    pendingRef.current = null;   // 🔥 CLEAR
-    setChatReply("✅ Plan updated successfully!");
+    pendingRef.current = null;
+    setChatReply("✅ Plan updated!");
   }
 
-  // ❌ User cancels (NO)
+  // ❌ CANCEL
   else if (result.action === "cancel_update") {
     pendingRef.current = null;
     setChatReply(result.reply);
   }
 
-  // 💬 Normal chat
   else {
     setChatReply(result.reply);
   }
