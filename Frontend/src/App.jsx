@@ -1177,7 +1177,7 @@ function TravelForm() {
     }
     const isValidDate = (date) => {
   return /^\d{1,2}\s[a-zA-Z]+(\s\d{4})?$/.test(date);
-};
+     };
 
 if (!isValidDate(formData.start_date) || !isValidDate(formData.end_date)) {
   alert("❌ Invalid date format. Use: 6 april or 6 april 2025");
@@ -1274,7 +1274,8 @@ if (!isValidDate(formData.start_date) || !isValidDate(formData.end_date)) {
 
   // ✅ STEP 2: CONFIRM UPDATE
   else if (result.action === "confirm_update") {
-    setItinerary(result.updated_itinerary);  // UI update
+    //setItinerary(result.updated_itinerary);  // UI update
+    setItinerary( result.itinerary ||result.updated_itinerary);
     pendingRef.current = null;
     setChatReply("✅ Plan updated successfully!");
   }

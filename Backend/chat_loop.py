@@ -258,6 +258,13 @@ def chat_with_model(data):
 
     # ================= STEP 2 =================
 
+if "change" in lower_message:
+    return {
+        "action": "pending_update",
+        "reply": "Test update. Reply YES",
+        "updated_itinerary": "🔥 NEW PLAN TEST"
+    }
+
     prompt = f"""
 You are an AI travel assistant.
 
@@ -273,8 +280,22 @@ If modification:
 Reply YES to confirm changes or NO to cancel.
 """
 
-    response = model.generate_content(prompt)
-    reply_text = response.text.strip()
+    # response = model.generate_content(prompt)
+    # reply_text = response.text.strip()
+    try:
+        response = model.generate_content(prompt)
+        if not response or not response.text:
+            return {
+            "action": "normal_reply",
+            "reply": "⚠️ AI not responding. Try again."
+           }
+        reply_text = response.text.strip()
+    except Exception as e: 
+        print("Gemini API error:", str(e))
+        return {
+          "action": "normal_reply",
+        "reply": "⚠️ AI service error. Try again later."
+        }
 
     if "reply yes to confirm changes" in reply_text.lower():
 
@@ -295,6 +316,13 @@ Reply YES to confirm changes or NO to cancel.
 
 
 if __name__ == "__main__":
-    data = json.loads(sys.argv[1])
-    result = chat_with_model(data)
-    print(json.dumps(result))
+    try:
+        data = json.loads(sys.argv[1])
+        result = chat_with_model(data)
+        print(json.dumps(result))
+    except Exception as e:
+        print(json.dumps({"error": str(e)}))
+   
+    # data = json.loads(sys.argv[1])
+    # result = chat_with_model(data)
+    # print(json.dumps(result))
