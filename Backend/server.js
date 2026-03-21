@@ -760,9 +760,10 @@ python.on("close", async () => {
     console.log("Rows updated:", updateResult.rowCount);
 
     return res.json({
-      action: "confirm_update",
-      updated_itinerary: result.updated_itinerary
-    });
+  action: "confirm_update",
+  updated_itinerary: result.updated_itinerary,
+  itinerary: result.updated_itinerary   // ✅ IMPORTANT
+});
   }
 
   // ================= PENDING UPDATE =================

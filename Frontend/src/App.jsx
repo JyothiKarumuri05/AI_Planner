@@ -1264,7 +1264,7 @@ if (!isValidDate(formData.start_date) || !isValidDate(formData.end_date)) {
 
   const result = await response.json();
 
-  console.log("CHAT RESPONSE:", result);
+  //console.log("CHAT RESPONSE:", result);
 
   // ✅ STEP 1: STORE GENERATED PLAN
   if (result.action === "pending_update") {
