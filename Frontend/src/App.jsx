@@ -1268,21 +1268,25 @@ if (!isValidDate(formData.start_date) || !isValidDate(formData.end_date)) {
 
   // ✅ STEP 1: STORE GENERATED PLAN
   if (result.action === "pending_update") {
-    pendingRef.current = result.updated_itinerary;   // 🔥 CRITICAL FIX
+    pendingRef.current = result.updated_itinerary;  
+    setPendingIntent(result.updated_itinerary); // 🔥 CRITICAL FIX
     setChatReply(result.reply);
   }
 
   // ✅ STEP 2: CONFIRM UPDATE
   else if (result.action === "confirm_update") {
-    //setItinerary(result.updated_itinerary);  // UI update
-    setItinerary( result.itinerary ||result.updated_itinerary);
+    setItinerary(result.updated_itinerary);  // UI update
     pendingRef.current = null;
+    setPendingIntent(null); // Clear pending intent
+    //setItinerary( result.itinerary ||result.updated_itinerary);
+    
     setChatReply("✅ Plan updated successfully!");
   }
 
   // ❌ CANCEL
   else if (result.action === "cancel_update") {
     pendingRef.current = null;
+    setPendingIntent(null); // Clear pending intent
     setChatReply(result.reply);
   }
 

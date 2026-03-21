@@ -466,9 +466,7 @@ def chat_with_model(data):
     itinerary = data["current_itinerary"]
     pending_update = data.get("pending_update")
 
-    print("🔥 FUNCTION CALLED")
-    print("USER MESSAGE:", user_message)
-
+    
     # ================= STEP 1 =================
     if pending_update:
 
@@ -491,10 +489,10 @@ def chat_with_model(data):
             }
 
     # ================= STEP 2 (TEST BLOCK) =================
-    print("🔥 CHECKING CHANGE BLOCK")
+  
 
     if "change" in lower_message:
-        print("✅ CHANGE DETECTED")
+        
 
         return {
             "action": "pending_update",
@@ -555,9 +553,8 @@ Reply YES to confirm changes or NO to cancel.
 
 
 if __name__ == "__main__":
-    try:
-        data = json.loads(sys.argv[1])
-        result = chat_with_model(data)
-        print(json.dumps(result))
-    except Exception as e:
-        print(json.dumps({"error": str(e)}))
+    data = json.loads(sys.argv[1])
+    result = chat_with_model(data)
+    print(json.dumps(result))
+    # except Exception as e:
+        # print(json.dumps({"error": str(e)}))
