@@ -607,10 +607,17 @@ function TravelForm() {
     travel_style: "",
     food_preference: ""
   });
-  const cleanInput = (value) => {
-  return value.trim().replace(/\.$/, ""); 
-};
+//   const cleanInput = (value) => {
+//   return value.trim().replace(/\.$/, ""); 
+// };
+const cleanInput = (value) => {
+  let cleaned = value.trim().toLowerCase();
 
+  // ✅ Fix: convert 6april → 6 april
+  cleaned = cleaned.replace(/(\d)([a-zA-Z])/g, "$1 $2");
+
+  return cleaned;
+};
   const [status, setStatus] = useState({});
   const [itinerary, setItinerary] = useState("");
   const [requestId, setRequestId] = useState(null);
@@ -674,6 +681,15 @@ function TravelForm() {
       alert(`Please fill in the ${emptyField[0].replace("_", " ")} field.`);
       return;
     }
+      // ✅ DATE VALIDATION (ADD HERE)
+  const isValidDate = (date) => {
+    return /^\d{1,2}\s[a-zA-Z]+(\s\d{4})?$/.test(date);
+  };
+
+  if (!isValidDate(formData.start_date) || !isValidDate(formData.end_date)) {
+    alert("❌ Invalid date format. Use: 6 april or 6 april 2025");
+    return;
+  }
     setLoading(true);
 
     try {
@@ -827,6 +843,55 @@ function TravelForm() {
 //   setChatMessage("");
 // };
 
+// const handleChatSend = async () => {
+//   if (!requestId || !chatMessage.trim()) return;
+
+//   console.log("📤 Sending pending_update:", pendingRef.current);
+
+//   const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({
+//       request_id: requestId,
+//       user_message: chatMessage,
+//       pending_update: pendingRef.current   // 🔥 FIX
+//     })
+//   });
+
+//   const result = await response.json();
+
+//   console.log("CHAT RESPONSE:", result);
+
+//   // ✅ STORE UPDATE
+//   if (result.action === "pending_update") {
+//     pendingRef.current = result.updated_itinerary;
+//     setPendingIntent(result.updated_itinerary);
+//     setChatReply(result.reply);
+//   }
+
+//   // ✅ CONFIRM
+//   else if (result.action === "confirm_update") {
+//     setItinerary(result.updated_itinerary);
+//     pendingRef.current = null;
+//     setPendingIntent(null);
+//     setChatReply("✅ Plan updated successfully!");
+//   }
+
+//   // ❌ CANCEL
+//   else if (result.action === "cancel_update") {
+//     pendingRef.current = null;
+//     setPendingIntent(null);
+//     setChatReply(result.reply);
+//   }
+
+//   // 💬 NORMAL
+//   else {
+//     setChatReply(result.reply);
+//   }
+
+//   setChatMessage("");
+// };
+
 const handleChatSend = async () => {
   if (!requestId || !chatMessage.trim()) return;
 
@@ -838,7 +903,7 @@ const handleChatSend = async () => {
     body: JSON.stringify({
       request_id: requestId,
       user_message: chatMessage,
-      pending_update: pendingRef.current   // 🔥 FIX
+      pending_update: pendingRef.current   // ✅ FIX
     })
   });
 
@@ -846,36 +911,32 @@ const handleChatSend = async () => {
 
   console.log("CHAT RESPONSE:", result);
 
-  // ✅ STORE UPDATE
+  // ✅ AI suggests updated plan
   if (result.action === "pending_update") {
-    pendingRef.current = result.updated_itinerary;
-    setPendingIntent(result.updated_itinerary);
+    pendingRef.current = result.updated_itinerary;   // 🔥 STORE
     setChatReply(result.reply);
   }
 
-  // ✅ CONFIRM
+  // ✅ User confirms (YES)
   else if (result.action === "confirm_update") {
     setItinerary(result.updated_itinerary);
-    pendingRef.current = null;
-    setPendingIntent(null);
+    pendingRef.current = null;   // 🔥 CLEAR
     setChatReply("✅ Plan updated successfully!");
   }
 
-  // ❌ CANCEL
+  // ❌ User cancels (NO)
   else if (result.action === "cancel_update") {
     pendingRef.current = null;
-    setPendingIntent(null);
     setChatReply(result.reply);
   }
 
-  // 💬 NORMAL
+  // 💬 Normal chat
   else {
     setChatReply(result.reply);
   }
 
   setChatMessage("");
 };
-
   const createRow = (label, field, voiceFn) => (
     <div className="form-row">
       <label>{label}</label>

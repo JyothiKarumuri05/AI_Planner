@@ -679,7 +679,7 @@ app.post("/chat", async (req, res) => {
     );
 
     if (dbRes.rows.length === 0) {
-      return res.status(404).json({ error: "Plan not found" });
+      return res.status(404).json({ error: "Itinerary not found" });
     }
 
     const itinerary = dbRes.rows[0].final_itinerary;
@@ -724,15 +724,15 @@ app.post("/chat", async (req, res) => {
         });
       }
 
-      // ✅ PENDING
-      if (result.action === "pending_update") {
-        return res.json(result);
-      }
+      // // ✅ PENDING
+      // if (result.action === "pending_update") {
+      //   return res.json(result);
+      // }
 
-      // ✅ CANCEL
-      if (result.action === "cancel_update") {
-        return res.json(result);
-      }
+      // // ✅ CANCEL
+      // if (result.action === "cancel_update") {
+      //   return res.json(result);
+      // }
 
       // ✅ NORMAL
       return res.json(result);
