@@ -479,7 +479,7 @@ def chat_with_model(data):
         elif lower_message == "no":
             return {
                 "action": "cancel_update",
-                "reply": "👍 No changes were made."
+                "reply": "👍 No changes were made"
             }
 
         else:
