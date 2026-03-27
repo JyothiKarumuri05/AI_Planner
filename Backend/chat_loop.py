@@ -512,15 +512,16 @@ User message:
 
 Instructions:
 
-1. If user wants to modify itinerary:
-   - Generate FULL updated itinerary
-   - Do not explain changes
-   - Start directly from Trip Overview
-   - End EXACTLY with:
-   Reply YES to confirm changes or NO to cancel.
+- If user wants ANY modification (change, update, replace, edit):
+  → ALWAYS generate FULL updated itinerary
+  → DO NOT say "confirmed"
+  → DO NOT finalize
+  → END EXACTLY with:
 
-2. If normal question:
-   - Answer normally
+Reply YES to confirm changes or NO to cancel.
+
+- If user is just asking question:
+  → Answer normally
 
 Return plain text only.
 """
@@ -549,7 +550,7 @@ Return plain text only.
             "reply": "⚠️ AI service error. Try again later."
         }
 
-    if "reply yes to confirm changes" in reply_text.lower():
+    if "reply yes" in reply_text.lower():
 
         updated_itinerary = reply_text.split(
             "Reply YES to confirm changes or NO to cancel."
