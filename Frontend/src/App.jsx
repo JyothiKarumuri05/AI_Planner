@@ -1221,108 +1221,6 @@ if (!isValidDate(formData.start_date) || !isValidDate(formData.end_date)) {
     setLoading(false);
   };
 
-
-//   const handleChatSend = async () => {
-//   if (!requestId || !chatMessage.trim()) return;
-
-//   console.log("📤 Sending pending_update:", pendingRef.current);
-
-//   const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({
-//       request_id: requestId,
-//       user_message: chatMessage,
-//       pending_update: pendingRef.current   // ✅ FIXED
-//     })
-//   });
-
-//   const result = await response.json();
-
-//   //console.log("CHAT RESPONSE:", result);
-
-//   // ✅ STEP 1: STORE GENERATED PLAN
-//   // if (result.action === "pending_update") {
-//   //   pendingRef.current = result.updated_itinerary;  
-//   //   setPendingIntent(result.updated_itinerary); // 🔥 CRITICAL FIX
-//   //   setChatReply(result.reply);
-//   // }
-//   if (result.action === "pending_update") {
-
-//   console.log("🧠 GENERATED PLAN:", result.updated_itinerary);   // ✅ ADD
-//   pendingRef.current = result.updated_itinerary;
-
-//   console.log("💾 STORED IN REF:", pendingRef.current);         // ✅ ADD
-
-//   setPendingIntent(result.updated_itinerary);
-//   setChatReply(result.reply);
-// }
-
-//   else if (result.action === "confirm_update") {
-//   // 🔥 FORCE UI UPDATE
-//    setItinerary(result.updated_itinerary);
-//   pendingRef.current = null;
-//   setPendingIntent(null);
-//   setChatReply("✅ Plan updated successfully!");
-// }
-
-
-
-//   // ❌ CANCEL
-//   else if (result.action === "cancel_update") {
-//     pendingRef.current = null;
-//     setPendingIntent(null); // Clear pending intent
-//     setChatReply(result.reply);
-//   }
-
-//   else {
-//     setChatReply(result.reply);
-//   }
-
-//   setChatMessage("");
-// };
-// const handleChatSend = async () => {
-//   if (!requestId || !chatMessage.trim()) return;
-
-//   const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({
-//       request_id: requestId,
-//       user_message: chatMessage,
-//       pending_update: pendingRef.current
-//     })
-//   });
-
-//   const result = await response.json();
-
-//   // 🟡 STEP 1: pending update
-//   if (result.action === "pending_update") {
-//     pendingRef.current = result.updated_itinerary;
-//     setChatReply(result.reply);
-//   }
-
-//   // 🟢 STEP 2: confirm update
-//   else if (result.action === "confirm_update") {
-//     setItinerary(result.updated_itinerary);
-//     pendingRef.current = null;
-//     setChatReply("✅ Plan updated successfully!");
-//   }
-
-//   // 🔴 STEP 3: cancel
-//   else if (result.action === "cancel_update") {
-//     pendingRef.current = null;
-//     setChatReply(result.reply);
-//   }
-
-//   // 🔵 STEP 4: normal chat
-//   else {
-//     setChatReply(result.reply);
-//   }
-
-//   setChatMessage("");
-// };
-
 const handleChatSend = async () => {
   if (!requestId || !chatMessage.trim()) return;
 
@@ -1347,14 +1245,18 @@ const handleChatSend = async () => {
   }
 
   else if (result.action === "confirm_update") {
-    setItinerary(result.updated_itinerary);
-    pendingRef.current = null;
+    setItinerary(result.itinerary);
+    setRequestId(prev => prev); 
+   // pendingRef.current = null;
     setPendingIntent(null);
     setChatReply("✅ Plan updated successfully!");
+    setTimeout(() => {
+    pendingRef.current = "";
+  }, 100);
   }
 
   else if (result.action === "cancel_update") {
-    pendingRef.current = null;
+   // pendingRef.current = null;
     setPendingIntent(null);
     setChatReply(result.reply);
   }
