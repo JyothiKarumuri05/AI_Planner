@@ -1242,7 +1242,7 @@ const handleChatSend = async () => {
    if (result.updated_itinerary) {
   pendingRef.current = result.updated_itinerary;
 }
-    setPendingIntent(result.updated_itinerary); // 🔥 CRITICAL
+    setPendingIntent(result.updated_itinerary); 
     setChatReply(result.reply);
   }
 
