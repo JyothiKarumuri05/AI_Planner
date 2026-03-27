@@ -1239,7 +1239,9 @@ const handleChatSend = async () => {
   console.log("FULL RESPONSE:", result);
 
   if (result.action === "pending_update") {
-    pendingRef.current = result.updated_itinerary;
+   if (result.updated_itinerary) {
+  pendingRef.current = result.updated_itinerary;
+}
     setPendingIntent(result.updated_itinerary); // 🔥 CRITICAL
     setChatReply(result.reply);
   }
