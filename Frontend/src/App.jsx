@@ -1119,7 +1119,7 @@ function TravelForm() {
 
   const [chatMessage, setChatMessage] = useState("");
   const [chatReply, setChatReply] = useState("");
-  const [pendingIntent ] = useState(null);
+  const [pendingIntent ,setPendingIntent ] = useState(null);
 
   const updateField = (field, value) => {
   const cleanedValue = cleanInput(value);
@@ -1343,7 +1343,7 @@ const handleChatSend = async () => {
   if (result.action === "pending_update") {
     pendingRef.current = result.updated_itinerary;
     setPendingIntent(result.updated_itinerary); // 🔥 CRITICAL
-    setChatReply(result.reply);
+    //setChatReply(result.reply);
   }
 
   else if (result.action === "confirm_update") {
