@@ -1096,7 +1096,7 @@ function useVoiceInput(setField, setStatus) {
 
 function TravelForm() {
   const { user } = useUser();
-  const pendingRef = useRef(null);
+  const pendingRef = useRef("");
 
   const [formData, setFormData] = useState({
     current_city: "",
@@ -1332,7 +1332,7 @@ const handleChatSend = async () => {
     body: JSON.stringify({
       request_id: requestId,
       user_message: chatMessage,
-      pending_update:  pendingIntent
+      pending_update:  pendingRef.current
     })
   });
 
@@ -1362,6 +1362,8 @@ const handleChatSend = async () => {
   else {
     setChatReply(result.reply);
   }
+  console.log("STORED:", pendingRef.current);
+  console.log("SENDING:", pendingRef.current);  
 
   setChatMessage("");
 }; 
