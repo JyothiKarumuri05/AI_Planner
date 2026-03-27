@@ -1343,7 +1343,7 @@ const handleChatSend = async () => {
   if (result.action === "pending_update") {
     pendingRef.current = result.updated_itinerary;
     setPendingIntent(result.updated_itinerary); // 🔥 CRITICAL
-    //setChatReply(result.reply);
+    setChatReply(result.reply);
   }
 
   else if (result.action === "confirm_update") {
@@ -1407,6 +1407,12 @@ const handleChatSend = async () => {
             />
             <button onClick={handleChatSend}>Send</button>
             {chatReply && <pre>{chatReply}</pre>}
+            {pendingIntent && (
+          <div>
+           <h4>Preview Updated Plan:</h4>
+          <pre>{pendingIntent}</pre>
+          </div>
+          )}
           </div>
         </div>
       )}
