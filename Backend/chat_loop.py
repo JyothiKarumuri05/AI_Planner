@@ -466,8 +466,8 @@ def chat_with_model(data):
     itinerary = data["current_itinerary"]
     pending_update = data.get("pending_update")
 
-    
-    # ================= STEP 1 =================
+   
+    # # ================= STEP 1 =================
     if pending_update:
 
         if lower_message == "yes":
@@ -491,14 +491,14 @@ def chat_with_model(data):
     # ================= STEP 2 (TEST BLOCK) =================
   
 
-    if "change" in lower_message:
+    # if "change" in lower_message:
         
 
-        return {
-            "action": "pending_update",
-            "reply": "Test update working. Reply YES",
-            "updated_itinerary": "🔥 NEW PLAN UPDATED SUCCESSFULLY"
-        }
+    #     return {
+    #         "action": "pending_update",
+    #         "reply": "Test update working. Reply YES",
+    #         "updated_itinerary": "🔥 NEW PLAN UPDATED SUCCESSFULLY"
+    #     }
 
     # ================= STEP 3 =================
     prompt = f"""
@@ -510,11 +510,26 @@ Current itinerary:
 User message:
 {user_message}
 
-If modification:
-- Return FULL updated itinerary
-- End with:
-Reply YES to confirm changes or NO to cancel.
+Instructions:
+
+1. If user wants to modify itinerary:
+   - Generate FULL updated itinerary
+   - Do not explain changes
+   - Start directly from Trip Overview
+   - End EXACTLY with:
+   Reply YES to confirm changes or NO to cancel.
+
+2. If normal question:
+   - Answer normally
+
+Return plain text only.
 """
+    
+# If modification:
+# - Return FULL updated itinerary
+# - End with:
+# Reply YES to confirm changes or NO to cancel.
+# """
 
     try:
         response = model.generate_content(prompt)

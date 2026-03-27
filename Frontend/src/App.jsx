@@ -1332,7 +1332,7 @@ const handleChatSend = async () => {
     body: JSON.stringify({
       request_id: requestId,
       user_message: chatMessage,
-      pending_update: pendingIntent || pendingRef.current
+      pending_update:  pendingRef.current
     })
   });
 
