@@ -468,7 +468,7 @@ def chat_with_model(data):
 
    
     # # ================= STEP 1 =================
-    if pending_update:
+    if pending_update is not None and pending_update != "":
 
         if lower_message == "yes":
             return {
@@ -488,19 +488,7 @@ def chat_with_model(data):
                 "reply": "Reply YES to confirm or NO to cancel."
             }
 
-    # ================= STEP 2 (TEST BLOCK) =================
-  
-
-    # if "change" in lower_message:
-        
-
-    #     return {
-    #         "action": "pending_update",
-    #         "reply": "Test update working. Reply YES",
-    #         "updated_itinerary": "🔥 NEW PLAN UPDATED SUCCESSFULLY"
-    #     }
-
-    # ================= STEP 3 =================
+# ================= STEP 3 =================
     prompt = f"""
 You are an AI travel assistant.
 

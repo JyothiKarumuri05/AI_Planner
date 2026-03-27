@@ -1230,7 +1230,7 @@ const handleChatSend = async () => {
     body: JSON.stringify({
       request_id: requestId,
       user_message: chatMessage,
-      pending_update:  pendingRef.current
+      pending_update:  pendingRef.current || null
     })
   });
 
@@ -1250,9 +1250,7 @@ const handleChatSend = async () => {
    // pendingRef.current = null;
     setPendingIntent(null);
     setChatReply("✅ Plan updated successfully!");
-    setTimeout(() => {
     pendingRef.current = "";
-  }, 100);
   }
 
   else if (result.action === "cancel_update") {
