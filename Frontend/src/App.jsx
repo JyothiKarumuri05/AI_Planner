@@ -1281,6 +1281,48 @@ if (!isValidDate(formData.start_date) || !isValidDate(formData.end_date)) {
 
 //   setChatMessage("");
 // };
+// const handleChatSend = async () => {
+//   if (!requestId || !chatMessage.trim()) return;
+
+//   const response = await fetch("https://ai-planner-b139.onrender.com/chat", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({
+//       request_id: requestId,
+//       user_message: chatMessage,
+//       pending_update: pendingRef.current
+//     })
+//   });
+
+//   const result = await response.json();
+
+//   // 🟡 STEP 1: pending update
+//   if (result.action === "pending_update") {
+//     pendingRef.current = result.updated_itinerary;
+//     setChatReply(result.reply);
+//   }
+
+//   // 🟢 STEP 2: confirm update
+//   else if (result.action === "confirm_update") {
+//     setItinerary(result.updated_itinerary);
+//     pendingRef.current = null;
+//     setChatReply("✅ Plan updated successfully!");
+//   }
+
+//   // 🔴 STEP 3: cancel
+//   else if (result.action === "cancel_update") {
+//     pendingRef.current = null;
+//     setChatReply(result.reply);
+//   }
+
+//   // 🔵 STEP 4: normal chat
+//   else {
+//     setChatReply(result.reply);
+//   }
+
+//   setChatMessage("");
+// };
+
 const handleChatSend = async () => {
   if (!requestId || !chatMessage.trim()) return;
 
@@ -1290,38 +1332,40 @@ const handleChatSend = async () => {
     body: JSON.stringify({
       request_id: requestId,
       user_message: chatMessage,
-      pending_update: pendingRef.current
+      pending_update: pendingIntent || pendingRef.current
     })
   });
 
   const result = await response.json();
 
-  // 🟡 STEP 1: pending update
+  console.log("FULL RESPONSE:", result);
+
   if (result.action === "pending_update") {
     pendingRef.current = result.updated_itinerary;
+    setPendingIntent(result.updated_itinerary); // 🔥 CRITICAL
     setChatReply(result.reply);
   }
 
-  // 🟢 STEP 2: confirm update
   else if (result.action === "confirm_update") {
     setItinerary(result.updated_itinerary);
     pendingRef.current = null;
+    setPendingIntent(null);
     setChatReply("✅ Plan updated successfully!");
   }
 
-  // 🔴 STEP 3: cancel
   else if (result.action === "cancel_update") {
     pendingRef.current = null;
+    setPendingIntent(null);
     setChatReply(result.reply);
   }
 
-  // 🔵 STEP 4: normal chat
   else {
     setChatReply(result.reply);
   }
 
   setChatMessage("");
-};
+}; 
+
   const createRow = (label, field, voiceFn) => (
     <div className="form-row">
       <label>{label}</label>
